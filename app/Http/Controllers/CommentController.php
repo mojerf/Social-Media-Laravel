@@ -4,15 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Comment;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Gate;
 
-class CommentController extends Controller
+class CommentController extends Controller implements HasMiddleware
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public static function middleware()
     {
-        //
+        return [
+            new Middleware('auth:sanctum',except:['index','show'])
+        ];
     }
 
     /**
@@ -20,30 +22,24 @@ class CommentController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        $fields = $request->validate([
+            'text'=>'required',
+            'post_id'=>'required|exists:posts,id',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Comment $comment)
-    {
-        //
-    }
+        $comment = $request->user()->comments()->create($fields);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Comment $comment)
-    {
-        //
+        return $comment;
     }
-
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Comment $comment)
     {
-        //
+        Gate::authorize('modify',$comment);
+
+        $comment->delete();
+
+        return ['message' => 'This comment was deleted!'];
     }
 }

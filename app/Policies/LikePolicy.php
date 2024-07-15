@@ -8,7 +8,7 @@ use Illuminate\Auth\Access\Response;
 
 class LikePolicy
 {
-    public function modifyforceDelete(User $user, Like $like): Response
+    public function modify(User $user, Like $like): Response
     {
         return $user->id === $like->user_id
             ? Response::allow()

@@ -16,5 +16,5 @@ Route::post('/login',[AuthController::class, 'login'])->name('login');
 Route::post('/logout',[AuthController::class, 'logout'])->middleware('auth:sanctum')->name('logout');
 
 Route::apiResource('posts',PostController::class);
-Route::apiResource('comments',CommentController::class);
-Route::apiResource('likes',LikeController::class);
+Route::apiResource('comments',CommentController::class)->only(['store','destroy']);
+Route::apiResource('likes',LikeController::class)->only(['store','destroy']);

@@ -4,15 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Like;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Gate;
 
-class LikeController extends Controller
+class LikeController extends Controller implements HasMiddleware
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public static function middleware()
     {
-        //
+        return [
+            new Middleware('auth:sanctum',except:['index','show'])
+        ];
     }
 
     /**
@@ -20,23 +22,13 @@ class LikeController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        $fields = $request->validate([
+            'post_id'=>'required|exists:posts,id',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Like $like)
-    {
-        //
-    }
+        $like = $request->user()->likes()->create($fields);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Like $like)
-    {
-        //
+        return $like;
     }
 
     /**
@@ -44,6 +36,10 @@ class LikeController extends Controller
      */
     public function destroy(Like $like)
     {
-        //
+        Gate::authorize('modify',$like);
+
+        $like->delete();
+
+        return ['message' => 'The like is removed!'];
     }
 }
