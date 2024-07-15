@@ -18,3 +18,5 @@ Route::post('/logout',[AuthController::class, 'logout'])->middleware('auth:sanct
 Route::apiResource('posts',PostController::class);
 Route::apiResource('comments',CommentController::class)->only(['store','destroy']);
 Route::apiResource('likes',LikeController::class)->only(['store','destroy']);
+
+Route::get('/likedPosts', [PostController::class,'userLikedPosts'])->middleware('auth:sanctum')->name('userLikedPosts');

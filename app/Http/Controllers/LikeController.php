@@ -26,7 +26,7 @@ class LikeController extends Controller implements HasMiddleware
             'post_id'=>'required|exists:posts,id',
         ]);
 
-        $like = $request->user()->likes()->create($fields);
+        $like = $request->user()->likes()->firstOrCreate($fields);
 
         return $like;
     }

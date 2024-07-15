@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
+use App\Models\Like;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -24,7 +26,7 @@ class PostController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        return Post::all();
+        return Post::withCount('likes')->withCount('comments')->with('comments')->paginate();
     }
 
     /**
@@ -94,7 +96,7 @@ class PostController extends Controller implements HasMiddleware
      */
     public function show(Post $post)
     {
-        return $post;
+        return Post::where('id',$post->id)->withCount('likes')->withCount('comments')->with('comments')->first();
     }
 
     /**
@@ -177,5 +179,11 @@ class PostController extends Controller implements HasMiddleware
         $filePath ? Storage::delete($filePath) : null;
 
         return ['message' => 'This post was deleted!'];
+    }
+
+    public function userLikedPosts()
+    {
+        $user_id = auth('sanctum')->user()->id;
+        return Post::whereRelation('likes', 'user_id', $user_id)->withCount('likes')->withCount('comments')->with('comments')->paginate();
     }
 }
