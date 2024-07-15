@@ -19,7 +19,7 @@ class PostFactory extends Factory
     {
         return [
             'text' => fake()->realText(),
-            'attachment' => fake()->imageUrl(),
+            'attachment' => fake()->boolean(50) ? fake()->imageUrl() : null,
             'user_id' => User::factory(),
         ];
     }
